@@ -6,7 +6,7 @@ import (
 
 var RootCmd = &cobra.Command{
 	Use:   "nexusfabric",
-	Short: "NexusFabric CLI to manage Hyperledger Fabric networks on Docker and Kubernetes",
+	Short: "NexusFabric CLI to manage Hyperledger Fabric networks on Docker and Kubernetes.",
 }
 
 func init() {

@@ -2,13 +2,21 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+
+	models "github.com/shubhamacharya/NexusFabric/internal/models"
 )
 
 type NetworkState struct {
 	Networks map[string]interface{} `json:"networks"`
 }
 
+func CreateState(networkConfig *models.Config) {
+	fmt.Printf("%v : ", networkConfig.Fabric)
+	var network models.Network;
+	
+}
 func LoadState(filePath string) (*NetworkState, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
