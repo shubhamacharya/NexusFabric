@@ -19,3 +19,4 @@ fabric:
     orderer:
       FABRIC_LOGGING_SPEC: DEBUG
   netname: "mysite"
+  portStart: 1700

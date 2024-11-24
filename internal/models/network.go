@@ -9,4 +9,5 @@ type Network struct {
 	Organizations []Organization `yaml:"organizations" json:"organizations"` // List of organizations
 	Name          string         `yaml:"name" json:"name"`                   // network name
 	Chaincodes    []Chaincode    `yaml:"chaincodes" json:"chaincodes"`       // List of chaincodes
+	Port          *Port          `yaml:"port" json:"port"`
 }

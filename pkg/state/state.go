@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/shubhamacharya/NexusFabric/internal/constants"
 	models "github.com/shubhamacharya/NexusFabric/internal/models"
 )
 
@@ -13,9 +15,26 @@ type NetworkState struct {
 }
 
 func CreateState(networkConfig *models.Config) {
-	fmt.Printf("%v : ", networkConfig.Fabric)
-	var network models.Network;
-	
+	// fmt.Printf("%v : ", networkConfig.Fabric)
+	var network models.Network
+	network.Name = networkConfig.Fabric.Netname
+	if networkConfig.Fabric.StartPort == 0 {
+		network.Port = models.NewPort(constants.DefaultPort)
+	} else {
+		network.Port = models.NewPort(networkConfig.Fabric.StartPort)
+	}
+	present := map[string]bool{}
+	for _, v := range networkConfig.Fabric.Peers {
+		org := strings.Split(v, ".")[1]
+		if present[org] != true {
+			present[org] = true
+
+			tempOrg := models.BuildNewOrganization(org, "ca-"+org, constants.TLSEnabled,&network.Port,)
+
+			// network.Organizations = append(network.Organizations, org)
+			fmt.Println(tempOrg)
+		}
+	}
 }
 func LoadState(filePath string) (*NetworkState, error) {
 	file, err := os.Open(filePath)

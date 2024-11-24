@@ -1,5 +1,9 @@
 package model
 
+import (
+	"strconv"
+)
+
 type Peer struct {
 	Name                              string   `yaml:"name" json:"name"`
 	CorePeerID                        *string  `yaml:"CORE_PEER_ID,omitempty" json:"CORE_PEER_ID,omitempty"`
@@ -34,7 +38,6 @@ type Peer struct {
 	ChaincodeListenPort               int      `yaml:"chaincodelistenport" json:"chaincodelistenport"`
 	PeerListenPort                    int      `yaml:"peerlistenport" json:"peerlistenport"`
 	Volumes                           []string `yaml:"volumes" json:"volumes"`
-	// Database                           *Database `yaml:"database,omitempty" json:"database,omitempty"`
 }
 
 func NewPeer() Peer {
@@ -59,4 +62,18 @@ func NewPeer() Peer {
 		FabricCfgPath:                    "/etc/hyperledger/peercfg",
 		Volumes:                          []string{},
 	}
+}
+
+func BuildNewPeers(FabricLoggingSpec string, TLSEnabled bool, port *Port, qtyPeers int) []Peer {
+	newPeers := make([]Peer, 0, qtyPeers)
+	for i := 0; i < qtyPeers; i++ {
+		peer := NewPeer()
+		GetNextAvailablePort(port)
+
+		peer.FabricLoggingSpec = FabricLoggingSpec
+		peer.CorePeerTLSEnabled = TLSEnabled
+		peer.CorePeerListenAddress = "0.0.0.0:" + strconv.Itoa(port.Port)
+		newPeers = append(newPeers, peer)
+	}
+	return newPeers
 }

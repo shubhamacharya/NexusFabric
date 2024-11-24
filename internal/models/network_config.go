@@ -5,11 +5,13 @@ type Config struct {
 }
 
 type FabricConfig struct {
-	CAs      []string `yaml:"cas"`
-	Peers    []string `yaml:"peers"`
-	Orderers []string `yaml:"orderers"`
-	Settings Settings `yaml:"settings"`
-	Netname  string   `yaml:"netname"`
+	CAs       []string `yaml:"cas"`
+	Peers     []string `yaml:"peers"`
+	Orderers  []string `yaml:"orderers"`
+	Settings  Settings `yaml:"settings"`
+	Netname   string   `yaml:"netname"`
+	StartPort int      `yaml: startport`
+	Port      *Port    `yaml:"port" json:"port"`
 }
 
 type Settings struct {
