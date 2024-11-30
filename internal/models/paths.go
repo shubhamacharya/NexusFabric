@@ -8,6 +8,7 @@ type Paths struct {
 	APPPATH                  string `yaml:"APPPATH" json:"APPPATH"`
 	GENERICNETCONFIG         string `yaml:"GENERICNETCONFIG" json:"GENERICNETCONFIG"`
 	NETWORKPATH              string `yaml:"NETWORKPATH" json:"NETWORKPATH"`
+	NETWORKSTATEPATH         string `yaml: "NETWORKSTATEPATH" json:"NETWORKSTATEPATH"`
 	NETWORKCONFIGPATH        string `yaml:"NETWORKCONFIGPATH" json:"NETWORKCONFIGPATH"`
 	NETWORKCONFIGTXFILE      string `yaml:"NETWORKCONFIGTXFILE" json:"NETWORKCONFIGTXFILE"`
 	NETWORKCONFIGTXJSONFILE  string `yaml:"NETWORKCONFIGTXJSONFILE" json:"NETWORKCONFIGTXJSONFILE"`
@@ -106,9 +107,11 @@ func NewPath(network *Network) Paths {
 	// Application Path : ${PWD}
 	Path.APPPATH, _ = filepath.Abs(".")
 	// ${PWD}/network_config.yaml
-	Path.GENERICNETCONFIG = Path.APPPATH + "network_config.yaml"
+	Path.GENERICNETCONFIG = Path.APPPATH + "/network_config.yaml"
 	// NETWORK Path : ${PWD}/[NETWORKNAME]/
-	Path.NETWORKPATH = Path.APPPATH + "networks/" + network.Name + "/"
+	Path.NETWORKPATH = Path.APPPATH + "/networks/" + network.Name + "/"
+	// Network State file
+	Path.NETWORKSTATEPATH = Path.NETWORKPATH + "state.json"
 
 	// ${PWD}/networks/[NETWORKNAME]/config/
 	Path.NETWORKCONFIGPATH = Path.NETWORKPATH + "config/"
@@ -124,7 +127,7 @@ func NewPath(network *Network) Paths {
 	Path.FABRICCAPATH = Path.NETWORKPATH + "fabric-ca/"
 
 	// Fabric CA Orderer : ca.orderer.[DOMAIN]
-	Path.CAORDERERNAME = network.CAOrderer.Name + "." + network.DomainName
+	Path.CAORDERERNAME = network.CAOrderer.Name
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/
 	Path.CAORDERERPATH = Path.FABRICCAPATH + network.CAOrderer.Name + "/"
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/admin/

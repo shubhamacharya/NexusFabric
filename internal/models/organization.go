@@ -19,7 +19,7 @@ func NewOrganization() Organization {
 }
 
 func BuildNewOrganization(
-	Name string,
+	Name,
 	CAName string,
 	TLSEnabled bool,
 	port *Port,
@@ -43,7 +43,7 @@ func BuildNewOrganization(
 	return Organization{
 		Name:     Name,
 		CA:       BuildNewCA(CAName, TLSEnabled, port),
-		Peers:    BuildNewPeers(constants.DefaultFabricLoggingSpec, TLSEnabled, port, QtyPeers),
+		Peers:    BuildNewPeers(Name, constants.DefaultFabricLoggingSpec, TLSEnabled, port, QtyPeers),
 		QtyPeers: QtyPeers,
 	}
 }

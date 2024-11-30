@@ -52,7 +52,6 @@ func NewPeer() Peer {
 		CorePeerGossipUseLeaderElection:  true,
 		CorePeerGossipOrgLeader:          false,
 		CorePeerGossipSkipHandshake:      true,
-		ChaincodeAsAServiceBuilderConfig: `{"peername":"peername"}`,
 		CoreChaincodeExecuteTimeout:      "300s",
 		CoreLedgerStateCouchDBConfigPass: "adminpw",
 		CoreLedgerStateCouchDBConfigUser: "admin",
@@ -64,13 +63,14 @@ func NewPeer() Peer {
 	}
 }
 
-func BuildNewPeers(FabricLoggingSpec string, TLSEnabled bool, port *Port, qtyPeers int) []Peer {
+func BuildNewPeers(orgName, FabricLoggingSpec string, TLSEnabled bool, port *Port, qtyPeers int) []Peer {
 	newPeers := make([]Peer, 0, qtyPeers)
-	for i := 0; i < qtyPeers; i++ {
+	for i := 1; i <= qtyPeers; i++ {
 		peer := NewPeer()
 		GetNextAvailablePort(port)
 
 		peer.FabricLoggingSpec = FabricLoggingSpec
+		peer.Name = "peer" + strconv.Itoa(i) + "." + orgName
 		peer.CorePeerTLSEnabled = TLSEnabled
 		peer.CorePeerListenAddress = "0.0.0.0:" + strconv.Itoa(port.Port)
 		newPeers = append(newPeers, peer)
