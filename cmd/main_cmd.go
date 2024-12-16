@@ -11,4 +11,6 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(PlatformDockerCmd, Platformk8sCmd)
+	RootCmd.PersistentFlags().StringVar(&netname, "netName", "", "Name of the network for / on which operation to be performed.")
+
 }

@@ -1,19 +1,25 @@
 package model
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
+	"reflect"
 )
 
 type Paths struct {
 	APPPATH                  string `yaml:"APPPATH" json:"APPPATH"`
 	GENERICNETCONFIG         string `yaml:"GENERICNETCONFIG" json:"GENERICNETCONFIG"`
+	NETWORKSTATELISTPATH     string `yaml:"NETWORKSTATELISTPATH" json:"NETWORKSTATELISTPATH"`
 	NETWORKPATH              string `yaml:"NETWORKPATH" json:"NETWORKPATH"`
-	NETWORKSTATEPATH         string `yaml: "NETWORKSTATEPATH" json:"NETWORKSTATEPATH"`
+	NETWORKSTATEPATH         string `yaml:"NETWORKSTATEPATH" json:"NETWORKSTATEPATH"`
 	NETWORKCONFIGPATH        string `yaml:"NETWORKCONFIGPATH" json:"NETWORKCONFIGPATH"`
 	NETWORKCONFIGTXFILE      string `yaml:"NETWORKCONFIGTXFILE" json:"NETWORKCONFIGTXFILE"`
 	NETWORKCONFIGTXJSONFILE  string `yaml:"NETWORKCONFIGTXJSONFILE" json:"NETWORKCONFIGTXJSONFILE"`
 	NETWORKCONFIGBUILDPATH   string `yaml:"NETWORKCONFIGBUILDPATH" json:"NETWORKCONFIGBUILDPATH"`
 	FABRICCAPATH             string `yaml:"FABRICCAPATH" json:"FABRICCAPATH"`
+	COMPOSEPATH              string `yaml:"COMPOSEPATH" json:"COMPOSEPATH"`
+	NETWORKCACOMPOSEPATH     string `yaml:"NETWORKCACOMPOSEPATH" json:"NETWORKCACOMPOSEPATH"`
 	CANETWORKNAME            string `yaml:"CANETWORKNAME" json:"CANETWORKNAME"`
 	CANETWORKPATH            string `yaml:"CANETWORKPATH" json:"CANETWORKPATH"`
 	CANETWORKCRYPTOPATH      string `yaml:"CANETWORKCRYPTOPATH" json:"CANETWORKCRYPTOPATH"`
@@ -50,7 +56,6 @@ type Paths struct {
 	CCCRYPTOTLSCAPATH        string `yaml:"CCCRYPTOTLSCAPATH" json:"CCCRYPTOTLSCAPATH"`
 	CHANNELARTIFACTSPATH     string `yaml:"CHANNELARTIFACTSPATH" json:"CHANNELARTIFACTSPATH"`
 	BLOCKFILE                string `yaml:"BLOCKFILE" json:"BLOCKFILE"`
-	COMPOSEPATH              string `yaml:"COMPOSEPATH" json:"COMPOSEPATH"`
 	CONFIGPATH               string `yaml:"CONFIGPATH" json:"CONFIGPATH"`
 	CONFIGPEER               string `yaml:"CONFIGPEER" json:"CONFIGPEER"`
 	CONFIGTX                 string `yaml:"CONFIGTX" json:"CONFIGTX"`
@@ -107,39 +112,63 @@ func NewPath(network *Network) Paths {
 	// Application Path : ${PWD}
 	Path.APPPATH, _ = filepath.Abs(".")
 	// ${PWD}/network_config.yaml
-	Path.GENERICNETCONFIG = Path.APPPATH + "/network_config.yaml"
+	Path.GENERICNETCONFIG = filepath.Join(Path.APPPATH, "/network_config.yaml")
+	// ${PWD}/network_states.json
+	Path.NETWORKSTATELISTPATH = filepath.Join(Path.APPPATH, "/networks/network_states.json")
 	// NETWORK Path : ${PWD}/[NETWORKNAME]/
-	Path.NETWORKPATH = Path.APPPATH + "/networks/" + network.Name + "/"
+	Path.NETWORKPATH = filepath.Join(Path.APPPATH, "/networks/", network.Name, "/")
 	// Network State file
-	Path.NETWORKSTATEPATH = Path.NETWORKPATH + "state.json"
+	Path.NETWORKSTATEPATH = filepath.Join(Path.NETWORKPATH, "state.json")
 
 	// ${PWD}/networks/[NETWORKNAME]/config/
-	Path.NETWORKCONFIGPATH = Path.NETWORKPATH + "config/"
+	Path.NETWORKCONFIGPATH = filepath.Join(Path.NETWORKPATH, "config/")
 	// ${PWD}/networks/[NETWORKNAME]/config/configtx.yaml
-	Path.NETWORKCONFIGTXFILE = Path.NETWORKCONFIGPATH + "configtx.yaml"
+	Path.NETWORKCONFIGTXFILE = filepath.Join(Path.NETWORKCONFIGPATH, "configtx.yaml")
 	// ${PWD}/networks/[NETWORKNAME]/config/configtx.json
-	Path.NETWORKCONFIGTXJSONFILE = Path.NETWORKCONFIGPATH + "configtx.json"
+	Path.NETWORKCONFIGTXJSONFILE = filepath.Join(Path.NETWORKCONFIGPATH, "configtx.json")
 
 	// ${PWD}/networks/[NETWORKNAME]/config/build/
-	Path.NETWORKCONFIGBUILDPATH = Path.NETWORKCONFIGPATH + "build/"
+	Path.NETWORKCONFIGBUILDPATH = filepath.Join(Path.NETWORKCONFIGPATH, "build/")
+
+	// ${PWD}/networks/[NETWORKNAME]/compose/
+	Path.COMPOSEPATH = filepath.Join(Path.NETWORKPATH, "compose/")
+
+	// ${PWD}/networks/[NETWORKNAME]/compose/[NETNAME]-ca.yaml
+	Path.NETWORKCACOMPOSEPATH = filepath.Join(Path.NETWORKPATH, "compose/", network.Name+"-ca.yaml")
 
 	// Fabric CAs Paths:  ${PWD}/networks/[NETWORKNAME]/fabricca/
-	Path.FABRICCAPATH = Path.NETWORKPATH + "fabric-ca/"
+	Path.FABRICCAPATH = filepath.Join(Path.NETWORKPATH, "fabric-ca/")
 
 	// Fabric CA Orderer : ca.orderer.[DOMAIN]
 	Path.CAORDERERNAME = network.CAOrderer.Name
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/
-	Path.CAORDERERPATH = Path.FABRICCAPATH + network.CAOrderer.Name + "/"
+	Path.CAORDERERPATH = filepath.Join(Path.FABRICCAPATH, network.CAOrderer.Name, "/")
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/admin/
-	Path.CAORDERERCACLIENTPATH = Path.CAORDERERPATH + "admin/"
+	Path.CAORDERERCACLIENTPATH = filepath.Join(Path.CAORDERERPATH, "admin/")
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/admin/msp/
-	Path.CAORDERERCACLIENTMSPPATH = Path.CAORDERERCACLIENTPATH + "msp/"
+	Path.CAORDERERCACLIENTMSPPATH = filepath.Join(Path.CAORDERERCACLIENTPATH, "msp/")
 
 	// Fabric CA Domain Cert Files
 	// ${PWD}/networks/[NETWORK]/fabric-ca/ca.orderer.[DOMAIN]/ca-cert.pem
-	Path.CACERTORDERERFILE = Path.CAORDERERCRYPTOPATH + "ca-cert.pem"
+	Path.CACERTORDERERFILE = filepath.Join(Path.CAORDERERCRYPTOPATH, "ca-cert.pem")
 	// ${PWD}/networks/[NETWORK]/fabricca/ca.orderer.[DOMAIN]/tls-cert.pem
-	Path.TLSCERTORDERERFILE = Path.CAORDERERCRYPTOPATH + "tls-cert.pem"
+	Path.TLSCERTORDERERFILE = filepath.Join(Path.CAORDERERCRYPTOPATH, "tls-cert.pem")
 
 	return Path
+}
+
+func CreateNewPaths(network *Network) {
+	Paths := NewPath(network)
+	values := reflect.ValueOf(Paths)
+	for i := 0; i < values.NumField(); i++ {
+		path := values.Field(i).Interface().(string)
+		dir := filepath.Dir(path)
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			err := os.MkdirAll(dir, os.ModePerm)
+			if err != nil {
+				fmt.Printf("Failed to create directory %s: %v\n", dir, err)
+			}
+		}
+	}
+	fmt.Printf("Created directory structure for network.\n")
 }

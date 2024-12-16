@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReadSpecsFile(networkConfigFilePath string) {
+func ReadNetworkConfigFile(networkConfigFilePath string) {
 	if networkConfigFilePath == "" {
 		networkConfigFilePath, _ = filepath.Abs(".")
 		networkConfigFilePath += "/network_config.yaml"
@@ -31,12 +31,6 @@ func ReadSpecsFile(networkConfigFilePath string) {
 	}
 	state.CreateState(&config)
 
-	// fmt.Printf("Fabric Config:\n%+v\n", config.Fabric)
-	// fmt.Printf("CAs: %v\n", config.Fabric.CAs)
-	// fmt.Printf("Peers: %v\n", config.Fabric.Peers)
-	// fmt.Printf("Orderers: %v\n", config.Fabric.Orderers)
-	// fmt.Printf("Netname: %s\n", config.Fabric.Netname)
-	// fmt.Printf("CA Logging Spec: %s\n", config.Fabric.Settings.CA.FabricLoggingSpec)
 }
 
 func CheckHLFBinaries(network *models.Network, paths *models.Paths) error {
